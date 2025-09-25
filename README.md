@@ -10,13 +10,26 @@ Uma API REST completa para gerenciamento de consultórios médicos, desenvolvida
   - Criação de usuários (Admin, Médico, Recepcionista)
   - Atualização de dados de usuários
   - Remoção de usuários (soft delete)
-  - Listagem de usuários
+  - Listagem de usuários com paginação e filtros
+  - Obtenção de usuário específico por ID
 - **Gerenciamento de Pacientes**:
-  - Cadastro de pacientes
-  - Listagem de pacientes
+  - Cadastro de pacientes com validação de CPF
+  - Listagem de pacientes com paginação
+  - Atualização de dados de pacientes
+  - Remoção de pacientes (soft delete)
+  - Obtenção de paciente específico por ID
+  - Busca de pacientes por nome ou CPF
 - **Gerenciamento de Consultas**:
   - Agendamento de consultas
-  - Listagem de consultas
+  - Listagem de consultas com paginação
+  - Atualização de consultas
+  - Remoção de consultas
+  - Obtenção de consulta específica por ID
+  - Busca de consultas por data, médico ou status
+- **Validações e Segurança**:
+  - Validação de CPF brasileiro
+  - Controle de acesso baseado em tipo de usuário
+  - Soft delete para preservar histórico
 - **Banco de Dados SQLite**: Com dados de exemplo pré-carregados
 
 ## 🛠️ Tecnologias Utilizadas
@@ -69,19 +82,27 @@ A API estará disponível em: `http://localhost:5000`
 - `POST /api/auth/login` - Realizar login
 
 #### Usuários
-- `GET /api/usuarios` - Listar usuários
+- `GET /api/usuarios` - Listar usuários (com paginação e filtros)
 - `POST /api/usuarios` - Criar usuário (apenas admin)
 - `GET /api/usuarios/{id}` - Obter usuário específico
 - `PUT /api/usuarios/{id}` - Atualizar usuário
 - `DELETE /api/usuarios/{id}` - Remover usuário (apenas admin)
 
 #### Pacientes
-- `GET /api/pacientes` - Listar pacientes
-- `POST /api/pacientes` - Criar paciente
+- `GET /api/pacientes` - Listar pacientes (com paginação)
+- `POST /api/pacientes` - Criar paciente (com validação de CPF)
+- `GET /api/pacientes/{id}` - Obter paciente específico
+- `PUT /api/pacientes/{id}` - Atualizar paciente
+- `DELETE /api/pacientes/{id}` - Remover paciente (admin/recepcionista)
+- `GET /api/pacientes/buscar` - Buscar pacientes por nome ou CPF
 
 #### Consultas
-- `GET /api/consultas` - Listar consultas
+- `GET /api/consultas` - Listar consultas (com paginação)
 - `POST /api/consultas` - Criar consulta
+- `GET /api/consultas/{id}` - Obter consulta específica
+- `PUT /api/consultas/{id}` - Atualizar consulta
+- `DELETE /api/consultas/{id}` - Remover consulta
+- `GET /api/consultas/buscar` - Buscar consultas por filtros
 
 #### Sistema
 - `GET /api/health` - Verificar saúde da API
@@ -113,9 +134,44 @@ curl -X POST http://localhost:5000/api/usuarios \
   }'
 ```
 
-#### 3. Listar Pacientes
+#### 3. Listar Pacientes com Paginação
 ```bash
-curl -X GET http://localhost:5000/api/pacientes \
+curl -X GET "http://localhost:5000/api/pacientes?pagina=1&por_pagina=10" \
+  -H "Authorization: Bearer SEU_TOKEN_JWT"
+```
+
+#### 4. Buscar Pacientes
+```bash
+curl -X GET "http://localhost:5000/api/pacientes/buscar?q=Carlos" \
+  -H "Authorization: Bearer SEU_TOKEN_JWT"
+```
+
+#### 5. Atualizar Paciente
+```bash
+curl -X PUT http://localhost:5000/api/pacientes/1 \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer SEU_TOKEN_JWT" \
+  -d '{
+    "telefone": "(11) 99999-0000",
+    "email": "novo.email@exemplo.com"
+  }'
+```
+
+#### 6. Buscar Consultas por Status
+```bash
+curl -X GET "http://localhost:5000/api/consultas/buscar?status=agendada" \
+  -H "Authorization: Bearer SEU_TOKEN_JWT"
+```
+
+#### 7. Buscar Consultas por Data
+```bash
+curl -X GET "http://localhost:5000/api/consultas/buscar?data_inicio=2024-01-01&data_fim=2024-01-31" \
+  -H "Authorization: Bearer SEU_TOKEN_JWT"
+```
+
+#### 8. Listar Usuários por Tipo
+```bash
+curl -X GET "http://localhost:5000/api/usuarios?tipo_usuario=medico&pagina=1&por_pagina=5" \
   -H "Authorization: Bearer SEU_TOKEN_JWT"
 ```
 
@@ -140,10 +196,14 @@ python test_api.py
 
 Este script demonstra:
 - Login e autenticação
-- Criação, listagem e atualização de usuários
-- Criação e listagem de pacientes
-- Criação e listagem de consultas
-- Remoção de usuários
+- Criação, listagem, atualização e remoção de usuários
+- Listagem com paginação e filtros
+- Criação, listagem, atualização e remoção de pacientes
+- Busca de pacientes por nome ou CPF
+- Validação de CPF
+- Criação, listagem, atualização e remoção de consultas
+- Busca de consultas por data, médico ou status
+- Controle de acesso baseado em tipo de usuário
 
 ## 📁 Estrutura do Projeto
 
