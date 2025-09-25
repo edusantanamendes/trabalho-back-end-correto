@@ -265,5 +265,3 @@ Para dúvidas ou problemas:
 4. Consulte os logs de erro para mais detalhes
 
 ---
-
-**Desenvolvido com ❤️ para gerenciamento de consultórios médicos**
